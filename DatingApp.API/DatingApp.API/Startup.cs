@@ -32,7 +32,14 @@ namespace DatingApp.API
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddDbContext<Data.DataContext>(x => x.UseSqlite
                (Configuration.GetConnectionString("DefaultConnection")));
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
             services.AddScoped<AuthRepositry, AuthRepositry>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
@@ -60,8 +67,8 @@ namespace DatingApp.API
                 app.UseHsts();
             }
 
-           // app.UseHttpsRedirection();            
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyOrigin());
+            // app.UseHttpsRedirection();            
+            app.UseCors("CorsPolicy");
             app.UseAuthentication();
             app.UseMvc();
         }
